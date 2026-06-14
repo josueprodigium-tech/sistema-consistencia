@@ -166,6 +166,155 @@ textarea:focus-visible {
   padding: 20px;
 }
 
+.commercial-hero {
+  margin-bottom: 28px;
+  padding: 20px 14px 14px;
+  border: 1px solid rgba(216, 255, 98, .22);
+  border-radius: 27px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(216, 255, 98, .13), transparent 13rem),
+    linear-gradient(155deg, #171c18, #111416 65%);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .2);
+}
+
+.flow-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 6px;
+}
+
+.flow-step > span {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: .82rem;
+  font-weight: 900;
+}
+
+.flow-step h2 {
+  margin: 3px 0 0;
+  font-size: 1.35rem;
+  letter-spacing: -.035em;
+}
+
+.movement-prompt {
+  margin: 18px 6px 12px;
+  color: var(--accent);
+  font-size: .8rem;
+  font-weight: 800;
+}
+
+.commercial-list {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .07);
+  border-radius: 20px;
+  background: rgba(6, 8, 9, .46);
+}
+
+.commercial-row {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  min-height: 68px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+
+.commercial-row:last-child {
+  border-bottom: 0;
+}
+
+.commercial-row.featured {
+  background: rgba(216, 255, 98, .035);
+}
+
+.commercial-emoji {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 12px;
+  background: #1b2021;
+  font-size: 1.2rem;
+}
+
+.commercial-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.commercial-copy strong {
+  font-size: .86rem;
+}
+
+.commercial-copy small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: .65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quick-counter {
+  display: grid;
+  grid-template-columns: 35px 36px 43px;
+  align-items: center;
+  text-align: center;
+}
+
+.quick-counter button {
+  width: 35px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid #333a3e;
+  border-radius: 12px;
+  background: #202528;
+  font-size: 1.25rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.quick-counter button.plus {
+  width: 43px;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 1.45rem;
+}
+
+.quick-counter strong {
+  font-size: 1.05rem;
+}
+
+.weekly-pulse {
+  margin: 13px 6px 1px;
+  color: var(--muted);
+  font-size: .72rem;
+}
+
+.weekly-pulse strong {
+  color: var(--text);
+}
+
+.personal-step {
+  margin: 0 0 14px;
+}
+
+.personal-step > span {
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  color: var(--text);
+}
+
 .card-title-row,
 .counter-card,
 .streak-card {
@@ -391,6 +540,78 @@ textarea::placeholder {
   font-size: 1.2rem;
 }
 
+.weekly-movement-card {
+  padding: 20px 14px 14px;
+}
+
+.weekly-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-top: 18px;
+}
+
+.weekly-stat-grid > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+  padding: 11px 3px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #0e1113;
+}
+
+.weekly-stat-grid span {
+  font-size: 1.1rem;
+}
+
+.weekly-stat-grid strong {
+  color: var(--accent);
+  font-size: 1.25rem;
+}
+
+.weekly-stat-grid small {
+  width: 100%;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: .52rem;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.conversion-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.conversion-card {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 17px 10px;
+  text-align: center;
+}
+
+.conversion-card > span {
+  font-size: 1.1rem;
+}
+
+.conversion-card strong {
+  margin-top: 8px;
+  color: var(--accent);
+  font-size: 1.7rem;
+  letter-spacing: -.05em;
+}
+
+.conversion-card small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: .66rem;
+}
+
 .check-list {
   padding: 7px 18px;
 }
@@ -605,6 +826,7 @@ textarea::placeholder {
 .finish-day {
   width: 100%;
   margin-top: 18px;
+  box-shadow: 0 12px 28px rgba(216, 255, 98, .12);
 }
 
 .finish-day.is-complete {

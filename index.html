@@ -34,6 +34,73 @@
           <span class="save-status" id="save-status" aria-live="polite">Guardado</span>
         </div>
 
+        <section class="commercial-hero" aria-labelledby="commercial-title">
+          <div class="flow-step">
+            <span>1</span>
+            <div>
+              <p class="eyebrow">Primero</p>
+              <h2 id="commercial-title">Ritmo Comercial</h2>
+            </div>
+          </div>
+          <p class="movement-prompt">¿Sigo avanzando?</p>
+          <div class="commercial-list">
+            <article class="commercial-row" data-daily-counter="prospects">
+              <span class="commercial-emoji" aria-hidden="true">👥</span>
+              <div class="commercial-copy"><strong>Prospectos</strong><small>Nuevos contactos</small></div>
+              <div class="quick-counter">
+                <button type="button" data-action="decrease" aria-label="Restar prospecto">−</button>
+                <strong id="prospects-value">0</strong>
+                <button type="button" class="plus" data-action="increase" aria-label="Sumar prospecto">+</button>
+              </div>
+            </article>
+            <article class="commercial-row" data-daily-counter="calls">
+              <span class="commercial-emoji" aria-hidden="true">📞</span>
+              <div class="commercial-copy"><strong>Llamadas</strong><small>Conversaciones iniciadas</small></div>
+              <div class="quick-counter">
+                <button type="button" data-action="decrease" aria-label="Restar llamada">−</button>
+                <strong id="calls-value">0</strong>
+                <button type="button" class="plus" data-action="increase" aria-label="Sumar llamada">+</button>
+              </div>
+            </article>
+            <article class="commercial-row" data-daily-counter="appointments">
+              <span class="commercial-emoji" aria-hidden="true">📅</span>
+              <div class="commercial-copy"><strong>Citas</strong><small>Agendadas</small></div>
+              <div class="quick-counter">
+                <button type="button" data-action="decrease" aria-label="Restar cita">−</button>
+                <strong id="appointments-value">0</strong>
+                <button type="button" class="plus" data-action="increase" aria-label="Sumar cita">+</button>
+              </div>
+            </article>
+            <article class="commercial-row featured" data-daily-counter="talks">
+              <span class="commercial-emoji" aria-hidden="true">🎤</span>
+              <div class="commercial-copy"><strong>Charlas</strong><small>Referencia: 1 diaria</small></div>
+              <div class="quick-counter">
+                <button type="button" data-action="decrease" aria-label="Restar charla">−</button>
+                <strong id="daily-talks-value">0</strong>
+                <button type="button" class="plus" data-action="increase" aria-label="Sumar charla">+</button>
+              </div>
+            </article>
+            <article class="commercial-row featured" data-daily-counter="enrollments">
+              <span class="commercial-emoji" aria-hidden="true">✍️</span>
+              <div class="commercial-copy"><strong>Inscripciones</strong><small>Referencia: 1 semanal</small></div>
+              <div class="quick-counter">
+                <button type="button" data-action="decrease" aria-label="Restar inscripción">−</button>
+                <strong id="daily-enrollments-value">0</strong>
+                <button type="button" class="plus" data-action="increase" aria-label="Sumar inscripción">+</button>
+              </div>
+            </article>
+          </div>
+          <p class="weekly-pulse">Esta semana: <strong id="today-weekly-movement">0 movimientos</strong></p>
+        </section>
+
+        <div class="flow-step personal-step">
+          <span>2</span>
+          <div>
+            <p class="eyebrow">Después</p>
+            <h2>Ritmo Personal</h2>
+          </div>
+        </div>
+
         <article class="card">
           <div class="card-title-row">
             <div>
@@ -120,7 +187,7 @@
         </article>
 
         <button type="button" class="button primary finish-day" id="finish-day">
-          Terminé por hoy
+          3 · Terminé por hoy
         </button>
       </section>
 
@@ -133,31 +200,32 @@
           <span class="week-state" id="week-state">En curso</span>
         </div>
 
-        <article class="card counter-card">
+        <article class="card weekly-movement-card">
           <div>
-            <p class="card-kicker">Meta semanal</p>
-            <h3>Charlas propias</h3>
-            <p class="muted">Objetivo: 2</p>
+            <p class="card-kicker">Movimiento acumulado</p>
+            <h3>Ritmo Comercial</h3>
           </div>
-          <div class="counter" data-counter="talks">
-            <button type="button" data-action="decrease" aria-label="Restar charla">−</button>
-            <strong id="talks-value">0</strong>
-            <button type="button" data-action="increase" aria-label="Sumar charla">+</button>
+          <div class="weekly-stat-grid">
+            <div><span>👥</span><strong id="week-prospects">0</strong><small>Prospectos</small></div>
+            <div><span>📞</span><strong id="week-calls">0</strong><small>Llamadas</small></div>
+            <div><span>📅</span><strong id="week-appointments">0</strong><small>Citas</small></div>
+            <div><span>🎤</span><strong id="week-talks">0</strong><small>Charlas</small></div>
+            <div><span>✍️</span><strong id="week-enrollments">0</strong><small>Inscrip.</small></div>
           </div>
         </article>
 
-        <article class="card counter-card">
-          <div>
-            <p class="card-kicker">Meta semanal</p>
-            <h3>Inscripciones propias</h3>
-            <p class="muted">Objetivo: 1 · registra todas</p>
-          </div>
-          <div class="counter" data-counter="enrollments">
-            <button type="button" data-action="decrease" aria-label="Restar inscripción">−</button>
-            <strong id="enrollments-value">0</strong>
-            <button type="button" data-action="increase" aria-label="Sumar inscripción">+</button>
-          </div>
-        </article>
+        <div class="conversion-grid">
+          <article class="card conversion-card">
+            <span>📅 → 🎤</span>
+            <strong id="appointment-conversion">0%</strong>
+            <small>Cita a charla</small>
+          </article>
+          <article class="card conversion-card">
+            <span>🎤 → ✍️</span>
+            <strong id="talk-conversion">0%</strong>
+            <small>Charla a inscripción</small>
+          </article>
+        </div>
 
         <div class="check-list card">
           <button type="button" class="check-row" data-week-toggle="ayrton">

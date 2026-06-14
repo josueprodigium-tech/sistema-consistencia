@@ -2,7 +2,8 @@
   "use strict";
 
   const STORAGE_KEY = "sistema-consistencia-v1";
-  const MAX_ENROLLMENTS = 999;
+  const MAX_COUNT = Number.MAX_SAFE_INTEGER;
+  const COMMERCIAL_FIELDS = ["prospects", "calls", "appointments", "talks", "enrollments"];
   const SATURATION_LABELS = {
     green: "Verde",
     yellow: "Amarillo",
@@ -15,8 +16,6 @@
     startDate,
     daily: {},
     weekly: {
-      talks: 0,
-      enrollments: 0,
       ayrton: false,
       claribel: false,
       expenses: false,
@@ -78,6 +77,53 @@
     return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : min;
   }
 
+  function safeCount(value) {
+    return Math.floor(safeNumber(value, 0, MAX_COUNT));
+  }
+
+  function normalizeDaily(daily, legacyWeekly = {}) {
+    const normalized = {};
+
+    Object.entries(daily || {}).forEach(([key, entry]) => {
+      normalized[key] = {
+        saturation: entry?.saturation || null,
+        medication: entry?.medication == null ? null : Boolean(entry.medication),
+        exercise: entry?.exercise == null ? null : Boolean(entry.exercise),
+        meals: entry?.meals == null ? null : Boolean(entry.meals),
+        gratitude: entry?.gratitude == null ? null : Boolean(entry.gratitude),
+        sleep: entry?.sleep || null,
+        note: typeof entry?.note === "string" ? entry.note : "",
+        completedAt: entry?.completedAt || null,
+        commercial: Object.fromEntries(
+          COMMERCIAL_FIELDS.map(field => [field, safeCount(entry?.commercial?.[field])])
+        )
+      };
+    });
+
+    const hasCommercialActivity = Object.values(normalized).some(entry =>
+      COMMERCIAL_FIELDS.some(field => entry.commercial[field] > 0)
+    );
+
+    if (!hasCommercialActivity && (legacyWeekly.talks || legacyWeekly.enrollments)) {
+      const today = dateKey(new Date());
+      normalized[today] ||= {
+        saturation: null,
+        medication: null,
+        exercise: null,
+        meals: null,
+        gratitude: null,
+        sleep: null,
+        note: "",
+        completedAt: null,
+        commercial: Object.fromEntries(COMMERCIAL_FIELDS.map(field => [field, 0]))
+      };
+      normalized[today].commercial.talks = safeCount(legacyWeekly.talks);
+      normalized[today].commercial.enrollments = safeCount(legacyWeekly.enrollments);
+    }
+
+    return normalized;
+  }
+
   function normalizeState(raw) {
     const fallback = defaultState();
     if (!raw || typeof raw !== "object") return fallback;
@@ -91,10 +137,8 @@
       currentWeek: {
         id: typeof week.id === "string" ? week.id : fallback.currentWeek.id,
         startDate: /^\d{4}-\d{2}-\d{2}$/.test(week.startDate || "") ? week.startDate : fallback.currentWeek.startDate,
-        daily: week.daily && typeof week.daily === "object" ? week.daily : {},
+        daily: normalizeDaily(week.daily, week.weekly),
         weekly: {
-          talks: safeNumber(week.weekly?.talks, 0, 2),
-          enrollments: safeNumber(week.weekly?.enrollments, 0, MAX_ENROLLMENTS),
           ayrton: Boolean(week.weekly?.ayrton),
           claribel: Boolean(week.weekly?.claribel),
           expenses: Boolean(week.weekly?.expenses),
@@ -141,10 +185,31 @@
         gratitude: null,
         sleep: null,
         note: "",
-        completedAt: null
+        completedAt: null,
+        commercial: Object.fromEntries(COMMERCIAL_FIELDS.map(field => [field, 0]))
       };
     }
-    return state.currentWeek.daily[today];
+    const entry = state.currentWeek.daily[today];
+    entry.commercial ||= Object.fromEntries(COMMERCIAL_FIELDS.map(field => [field, 0]));
+    COMMERCIAL_FIELDS.forEach(field => {
+      entry.commercial[field] = safeCount(entry.commercial[field]);
+    });
+    return entry;
+  }
+
+  function getCommercialTotals(week = state.currentWeek) {
+    const totals = Object.fromEntries(COMMERCIAL_FIELDS.map(field => [field, 0]));
+    Object.values(week.daily || {}).forEach(entry => {
+      COMMERCIAL_FIELDS.forEach(field => {
+        totals[field] += safeCount(entry?.commercial?.[field]);
+      });
+    });
+    return totals;
+  }
+
+  function conversionRate(result, base) {
+    if (!base) return 0;
+    return Math.round((result / base) * 100);
   }
 
   function calculateScore(week = state.currentWeek) {
@@ -152,22 +217,24 @@
     const medicationDays = entries.filter(entry => entry.medication === true).length;
     const exerciseDays = entries.filter(entry => entry.exercise === true).length;
     const weekly = week.weekly || {};
+    const commercial = getCommercialTotals(week);
 
     const parts = {
       medication: Math.min(35, medicationDays * 5),
       exercise: Math.min(35, exerciseDays * 5),
-      talks: safeNumber(weekly.talks, 0, 2) * 5,
-      enrollments: safeNumber(weekly.enrollments, 0, 1) * 5,
+      talks: Math.min(10, commercial.talks * (10 / 7)),
+      enrollments: commercial.enrollments >= 1 ? 5 : 0,
       ayrton: weekly.ayrton ? 5 : 0,
       claribel: weekly.claribel ? 5 : 0,
       expenses: weekly.expenses ? 5 : 0
     };
 
     return {
-      total: Object.values(parts).reduce((sum, value) => sum + value, 0),
+      total: Math.round(Object.values(parts).reduce((sum, value) => sum + value, 0)),
       parts,
       medicationDays,
-      exerciseDays
+      exerciseDays,
+      commercial
     };
   }
 
@@ -196,6 +263,12 @@
     }).format(now);
 
     const entry = getTodayEntry();
+    const totals = getCommercialTotals();
+    COMMERCIAL_FIELDS.forEach(field => {
+      $(`#${field === "talks" || field === "enrollments" ? `daily-${field}` : field}-value`).textContent = entry.commercial[field];
+    });
+    const movement = Object.values(totals).reduce((sum, value) => sum + value, 0);
+    $("#today-weekly-movement").textContent = `${movement} ${movement === 1 ? "movimiento" : "movimientos"}`;
     selectSegment("#saturation-control", entry.saturation);
     selectSegment("#medication-control", entry.medication === null ? null : String(entry.medication));
     selectSegment("#exercise-control", entry.exercise === null ? null : String(entry.exercise));
@@ -215,7 +288,7 @@
 
     const finishButton = $("#finish-day");
     const isComplete = Boolean(entry.completedAt) && isDailyEntryComplete(entry);
-    finishButton.textContent = isComplete ? "✓ Registro de hoy completo" : "Terminé por hoy";
+    finishButton.textContent = isComplete ? "✓ Registro de hoy completo" : "3 · Terminé por hoy";
     finishButton.classList.toggle("is-complete", isComplete);
   }
 
@@ -238,10 +311,14 @@
 
   function renderWeek() {
     const week = state.currentWeek;
+    const totals = getCommercialTotals(week);
     $("#week-range").textContent = formatWeekRange(week.startDate);
     $("#week-state").textContent = week.closed ? "Cerrada" : "En curso";
-    $("#talks-value").textContent = week.weekly.talks;
-    $("#enrollments-value").textContent = week.weekly.enrollments;
+    COMMERCIAL_FIELDS.forEach(field => {
+      $(`#week-${field}`).textContent = totals[field];
+    });
+    $("#appointment-conversion").textContent = `${conversionRate(totals.talks, totals.appointments)}%`;
+    $("#talk-conversion").textContent = `${conversionRate(totals.enrollments, totals.talks)}%`;
     $$("#view-week button").forEach(button => {
       button.disabled = week.closed;
     });
@@ -271,8 +348,8 @@
     const breakdown = [
       ["Medicación", `${result.medicationDays}/7 días`, result.parts.medication, 35],
       ["Ejercicio", `${result.exerciseDays}/7 días`, result.parts.exercise, 35],
-      ["Charlas propias", `${state.currentWeek.weekly.talks}/2`, result.parts.talks, 10],
-      ["Inscripción propia", `${state.currentWeek.weekly.enrollments} (meta 1)`, result.parts.enrollments, 5],
+      ["Charlas", `${result.commercial.talks} (referencia 7)`, Math.round(result.parts.talks), 10],
+      ["Inscripciones", `${result.commercial.enrollments} (referencia 1)`, result.parts.enrollments, 5],
       ["Sesión Ayrton", state.currentWeek.weekly.ayrton ? "Sí" : "No", result.parts.ayrton, 5],
       ["Sesión Claribel", state.currentWeek.weekly.claribel ? "Sí" : "No", result.parts.claribel, 5],
       ["Gastos registrados", state.currentWeek.weekly.expenses ? "Sí" : "No", result.parts.expenses, 5]
@@ -295,14 +372,24 @@
     $("#history-list").innerHTML = history.map(item => {
       const color = scoreState(item.score).key;
       const saturation = item.predominantSaturation || "none";
+      const commercial = item.commercial || {
+        prospects: 0,
+        calls: 0,
+        appointments: 0,
+        talks: item.talks || 0,
+        enrollments: item.enrollments || 0
+      };
       return `
         <article class="card history-card">
           <div>
             <p class="card-kicker">Semana del</p>
             <h3 class="history-date">${escapeHtml(formatDate(item.startDate, { day: "numeric", month: "long", year: "numeric" }))}</h3>
             <div class="history-stats">
-              <span>Charlas ${safeNumber(item.talks, 0, 2)}/2</span>
-              <span>Inscripciones ${safeNumber(item.enrollments, 0, MAX_ENROLLMENTS)} (meta 1)</span>
+              <span>👥 ${safeCount(commercial.prospects)} prospectos</span>
+              <span>📞 ${safeCount(commercial.calls)} llamadas</span>
+              <span>📅 ${safeCount(commercial.appointments)} citas</span>
+              <span>🎤 ${safeCount(commercial.talks)} charlas</span>
+              <span>✍️ ${safeCount(commercial.enrollments)} inscripciones</span>
               <span>Saturación: ${escapeHtml(SATURATION_LABELS[saturation] || SATURATION_LABELS.none)}</span>
             </div>
           </div>
@@ -340,13 +427,15 @@
     if (state.currentWeek.closed) return;
 
     const score = calculateScore(state.currentWeek).total;
+    const commercial = getCommercialTotals(state.currentWeek);
     const snapshot = {
       id: state.currentWeek.id,
       startDate: state.currentWeek.startDate,
       closedAt: new Date().toISOString(),
       score,
-      talks: state.currentWeek.weekly.talks,
-      enrollments: state.currentWeek.weekly.enrollments,
+      talks: commercial.talks,
+      enrollments: commercial.enrollments,
+      commercial,
       ayrton: state.currentWeek.weekly.ayrton,
       claribel: state.currentWeek.weekly.claribel,
       expenses: state.currentWeek.weekly.expenses,
@@ -395,6 +484,7 @@
       view.classList.toggle("is-active", active);
     });
 
+    if (name === "week") renderWeek();
     if (name === "score") renderScore();
     if (name === "history") renderHistory();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -408,6 +498,19 @@
     $$("#saturation-control button").forEach(button => {
       button.addEventListener("click", () => {
         getTodayEntry().saturation = button.dataset.value;
+        saveState();
+        renderToday();
+      });
+    });
+
+    $$("[data-daily-counter]").forEach(counter => {
+      counter.addEventListener("click", event => {
+        const button = event.target.closest("button");
+        if (!button) return;
+        const field = counter.dataset.dailyCounter;
+        const change = button.dataset.action === "increase" ? 1 : -1;
+        const entry = getTodayEntry();
+        entry.commercial[field] = safeCount(entry.commercial[field] + change);
         saveState();
         renderToday();
       });
@@ -451,19 +554,6 @@
       saveState();
       renderToday();
       showToast("Registro de hoy completo.");
-    });
-
-    $$("[data-counter]").forEach(counter => {
-      counter.addEventListener("click", event => {
-        const button = event.target.closest("button");
-        if (!button) return;
-        const field = counter.dataset.counter;
-        const max = field === "talks" ? 2 : MAX_ENROLLMENTS;
-        const change = button.dataset.action === "increase" ? 1 : -1;
-        state.currentWeek.weekly[field] = safeNumber(state.currentWeek.weekly[field] + change, 0, max);
-        saveState();
-        renderWeek();
-      });
     });
 
     $$("[data-week-toggle]").forEach(button => {
