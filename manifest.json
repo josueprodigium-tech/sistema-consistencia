@@ -1,0 +1,22 @@
+{
+  "name": "Sistema de Consistencia",
+  "short_name": "Consistencia",
+  "description": "Registro diario y semanal de consistencia personal.",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d0f",
+  "theme_color": "#0b0d0f",
+  "lang": "es-MX",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

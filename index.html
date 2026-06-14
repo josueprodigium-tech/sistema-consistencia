@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Consistencia">
+  <meta name="description" content="Registro diario y semanal de consistencia personal.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <title>Sistema de Consistencia</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Sistema de</p>
+        <h1>Consistencia</h1>
+      </div>
+      <div class="header-mark" aria-hidden="true">SC</div>
+    </header>
+
+    <main>
+      <section class="view is-active" id="view-today" data-view="today">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Hoy</p>
+            <h2 id="today-date">—</h2>
+          </div>
+          <span class="save-status" id="save-status" aria-live="polite">Guardado</span>
+        </div>
+
+        <article class="card">
+          <div class="card-title-row">
+            <div>
+              <p class="card-kicker">Estado</p>
+              <h3>¿Cómo está tu saturación?</h3>
+            </div>
+            <span class="status-dot neutral" id="saturation-dot"></span>
+          </div>
+          <div class="segmented three" id="saturation-control" role="group" aria-label="Saturación">
+            <button type="button" data-value="green"><span class="choice-dot green"></span>Verde</button>
+            <button type="button" data-value="yellow"><span class="choice-dot yellow"></span>Amarillo</button>
+            <button type="button" data-value="red"><span class="choice-dot red"></span>Rojo</button>
+          </div>
+        </article>
+
+        <div class="two-column">
+          <article class="card compact">
+            <p class="card-kicker">Medicación</p>
+            <h3>¿Cumplida?</h3>
+            <div class="segmented" id="medication-control" role="group" aria-label="Medicación">
+              <button type="button" data-value="true">Sí</button>
+              <button type="button" data-value="false">No</button>
+            </div>
+          </article>
+
+          <article class="card compact">
+            <p class="card-kicker">Ejercicio</p>
+            <h3>¿Hecho?</h3>
+            <div class="segmented" id="exercise-control" role="group" aria-label="Ejercicio">
+              <button type="button" data-value="true">Sí</button>
+              <button type="button" data-value="false">No</button>
+            </div>
+          </article>
+        </div>
+
+        <article class="card">
+          <label for="daily-note">
+            <span class="card-kicker">Nota rápida</span>
+            <strong>¿Qué me drenó o me dio energía?</strong>
+          </label>
+          <textarea id="daily-note" rows="3" maxlength="240" placeholder="Opcional. Una línea basta."></textarea>
+          <div class="textarea-meta"><span>Se guarda automáticamente</span><span id="note-count">0/240</span></div>
+        </article>
+      </section>
+
+      <section class="view" id="view-week" data-view="week" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Semana actual</p>
+            <h2 id="week-range">—</h2>
+          </div>
+          <span class="week-state" id="week-state">En curso</span>
+        </div>
+
+        <article class="card counter-card">
+          <div>
+            <p class="card-kicker">Meta semanal</p>
+            <h3>Charlas propias</h3>
+            <p class="muted">Objetivo: 2</p>
+          </div>
+          <div class="counter" data-counter="talks">
+            <button type="button" data-action="decrease" aria-label="Restar charla">−</button>
+            <strong id="talks-value">0</strong>
+            <button type="button" data-action="increase" aria-label="Sumar charla">+</button>
+          </div>
+        </article>
+
+        <article class="card counter-card">
+          <div>
+            <p class="card-kicker">Meta semanal</p>
+            <h3>Inscripciones propias</h3>
+            <p class="muted">Objetivo: 1</p>
+          </div>
+          <div class="counter" data-counter="enrollments">
+            <button type="button" data-action="decrease" aria-label="Restar inscripción">−</button>
+            <strong id="enrollments-value">0</strong>
+            <button type="button" data-action="increase" aria-label="Sumar inscripción">+</button>
+          </div>
+        </article>
+
+        <div class="check-list card">
+          <button type="button" class="check-row" data-week-toggle="ayrton">
+            <span><small>Sesión</small>Ayrton</span>
+            <span class="switch" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="check-row" data-week-toggle="claribel">
+            <span><small>Sesión</small>Claribel</span>
+            <span class="switch" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="check-row" data-week-toggle="expenses">
+            <span><small>Administración</small>Gastos registrados</span>
+            <span class="switch" aria-hidden="true"></span>
+          </button>
+        </div>
+      </section>
+
+      <section class="view" id="view-score" data-view="score" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Balance</p>
+            <h2>Score semanal</h2>
+          </div>
+        </div>
+
+        <article class="score-card state-red" id="score-card">
+          <div class="score-ring" id="score-ring">
+            <div>
+              <strong id="score-value">0</strong>
+              <span>/ 100</span>
+            </div>
+          </div>
+          <div class="score-copy">
+            <span class="state-label" id="score-label">Rojo</span>
+            <h3 id="score-message">Empieza con una acción pequeña.</h3>
+            <p>El score orienta. No decide si la semana valió.</p>
+          </div>
+        </article>
+
+        <article class="card streak-card">
+          <div>
+            <p class="card-kicker">Continuidad</p>
+            <h3>Semanas sin reiniciar</h3>
+          </div>
+          <strong id="streak-value">0</strong>
+        </article>
+
+        <article class="card breakdown-card">
+          <div class="card-title-row">
+            <div>
+              <p class="card-kicker">Detalle</p>
+              <h3>Cómo se forma tu score</h3>
+            </div>
+          </div>
+          <div id="score-breakdown"></div>
+        </article>
+
+        <div class="action-stack">
+          <button type="button" class="button primary" id="close-week">Cerrar semana</button>
+          <button type="button" class="button secondary" id="new-week">Nueva semana</button>
+          <button type="button" class="button text danger-text" id="reset-streak">Reinicié</button>
+        </div>
+      </section>
+
+      <section class="view" id="view-history" data-view="history" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Registro</p>
+            <h2>Historial</h2>
+          </div>
+          <span class="history-count" id="history-count">0 semanas</span>
+        </div>
+
+        <div class="history-list" id="history-list"></div>
+
+        <article class="card data-card">
+          <p class="card-kicker">Tus datos</p>
+          <h3>Control local</h3>
+          <p class="muted">Todo vive únicamente en este dispositivo.</p>
+          <div class="data-actions">
+            <button type="button" class="button secondary" id="export-data">Exportar JSON</button>
+            <button type="button" class="button text danger-text" id="delete-data">Borrar todos los datos</button>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <nav class="tab-bar" aria-label="Navegación principal">
+      <button type="button" class="tab is-active" data-tab="today" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v3M17 3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"/></svg>
+        <span>Hoy</span>
+      </button>
+      <button type="button" class="tab" data-tab="week">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h5M8 16h3"/></svg>
+        <span>Semana</span>
+      </button>
+      <button type="button" class="tab" data-tab="score">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>
+        <span>Score</span>
+      </button>
+      <button type="button" class="tab" data-tab="history">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v6l4 2"/></svg>
+        <span>Historial</span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
