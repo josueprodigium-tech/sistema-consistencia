@@ -42,16 +42,16 @@
             </div>
             <span class="status-dot neutral" id="saturation-dot"></span>
           </div>
-          <div class="segmented three" id="saturation-control" role="group" aria-label="Saturación">
-            <button type="button" data-value="green"><span class="choice-dot green"></span>Verde</button>
-            <button type="button" data-value="yellow"><span class="choice-dot yellow"></span>Amarillo</button>
-            <button type="button" data-value="red"><span class="choice-dot red"></span>Rojo</button>
+          <div class="saturation-options" id="saturation-control" role="group" aria-label="Saturación">
+            <button type="button" data-value="green" aria-label="Saturación verde"><span class="color-orb green"></span></button>
+            <button type="button" data-value="yellow" aria-label="Saturación amarilla"><span class="color-orb yellow"></span></button>
+            <button type="button" data-value="red" aria-label="Saturación roja"><span class="color-orb red"></span></button>
           </div>
         </article>
 
         <div class="two-column">
           <article class="card compact">
-            <p class="card-kicker">Medicación</p>
+            <p class="habit-icon" aria-hidden="true">💊</p>
             <h3>¿Cumplida?</h3>
             <div class="segmented" id="medication-control" role="group" aria-label="Medicación">
               <button type="button" data-value="true">Sí</button>
@@ -60,7 +60,7 @@
           </article>
 
           <article class="card compact">
-            <p class="card-kicker">Ejercicio</p>
+            <p class="habit-icon" aria-hidden="true">🏋️</p>
             <h3>¿Hecho?</h3>
             <div class="segmented" id="exercise-control" role="group" aria-label="Ejercicio">
               <button type="button" data-value="true">Sí</button>
@@ -77,6 +77,10 @@
           <textarea id="daily-note" rows="3" maxlength="240" placeholder="Opcional. Una línea basta."></textarea>
           <div class="textarea-meta"><span>Se guarda automáticamente</span><span id="note-count">0/240</span></div>
         </article>
+
+        <button type="button" class="button primary finish-day" id="finish-day">
+          Terminé por hoy
+        </button>
       </section>
 
       <section class="view" id="view-week" data-view="week" hidden>

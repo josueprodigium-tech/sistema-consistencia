@@ -135,7 +135,8 @@
         saturation: null,
         medication: null,
         exercise: null,
-        note: ""
+        note: "",
+        completedAt: null
       };
     }
     return state.currentWeek.daily[today];
@@ -203,6 +204,11 @@
     const note = $("#daily-note");
     if (document.activeElement !== note) note.value = entry.note || "";
     $("#note-count").textContent = `${note.value.length}/240`;
+
+    const finishButton = $("#finish-day");
+    const isComplete = Boolean(entry.completedAt);
+    finishButton.textContent = isComplete ? "✓ Registro de hoy completo" : "Terminé por hoy";
+    finishButton.classList.toggle("is-complete", isComplete);
   }
 
   function selectSegment(selector, value) {
@@ -404,6 +410,23 @@
       $("#note-count").textContent = `${event.target.value.length}/240`;
       clearTimeout(noteTimer);
       noteTimer = setTimeout(() => saveState(), 250);
+    });
+
+    $("#finish-day").addEventListener("click", () => {
+      const entry = getTodayEntry();
+      const requiredComplete = entry.saturation
+        && entry.medication !== null
+        && entry.exercise !== null;
+
+      if (!requiredComplete) {
+        showToast("Elige saturación, pastilla y ejercicio.");
+        return;
+      }
+
+      entry.completedAt = new Date().toISOString();
+      saveState();
+      renderToday();
+      showToast("Registro de hoy completo.");
     });
 
     $$("[data-counter]").forEach(counter => {

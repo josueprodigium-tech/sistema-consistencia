@@ -205,10 +205,6 @@ textarea:focus-visible {
   background: #0e1113;
 }
 
-.segmented.three {
-  grid-template-columns: repeat(3, 1fr);
-}
-
 .segmented button {
   min-height: 44px;
   padding: 8px 10px;
@@ -227,17 +223,44 @@ textarea:focus-visible {
   box-shadow: 0 2px 10px rgba(0,0,0,.24);
 }
 
-.choice-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 5px;
-  border-radius: 50%;
+.saturation-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
 }
 
-.choice-dot.green { background: var(--green); }
-.choice-dot.yellow { background: var(--yellow); }
-.choice-dot.red { background: var(--red); }
+.saturation-options button {
+  display: grid;
+  min-height: 72px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #0e1113;
+  cursor: pointer;
+}
+
+.saturation-options button.is-selected {
+  border-color: #5a6268;
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .06);
+}
+
+.color-orb {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.color-orb.green { background: var(--green); box-shadow: 0 0 0 8px var(--green-soft); }
+.color-orb.yellow { background: var(--yellow); box-shadow: 0 0 0 8px var(--yellow-soft); }
+.color-orb.red { background: var(--red); box-shadow: 0 0 0 8px var(--red-soft); }
+
+.saturation-options button.is-selected .color-orb {
+  transform: scale(1.12);
+}
 
 .two-column {
   display: grid;
@@ -247,6 +270,12 @@ textarea:focus-visible {
 
 .card.compact {
   padding: 18px 15px;
+}
+
+.habit-icon {
+  margin: 0;
+  font-size: 1.65rem;
+  line-height: 1;
 }
 
 .card.compact .segmented {
@@ -508,6 +537,17 @@ textarea::placeholder {
 .button.primary:disabled {
   background: #343a32;
   color: #8e9586;
+}
+
+.finish-day {
+  width: 100%;
+  margin-top: 18px;
+}
+
+.finish-day.is-complete {
+  border: 1px solid rgba(94, 227, 154, .38);
+  background: var(--green-soft);
+  color: var(--green);
 }
 
 .button.secondary {
