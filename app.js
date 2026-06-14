@@ -19,7 +19,8 @@
       enrollments: 0,
       ayrton: false,
       claribel: false,
-      expenses: false
+      expenses: false,
+      church: false
     },
     closed: false
   });
@@ -96,7 +97,8 @@
           enrollments: safeNumber(week.weekly?.enrollments, 0, MAX_ENROLLMENTS),
           ayrton: Boolean(week.weekly?.ayrton),
           claribel: Boolean(week.weekly?.claribel),
-          expenses: Boolean(week.weekly?.expenses)
+          expenses: Boolean(week.weekly?.expenses),
+          church: Boolean(week.weekly?.church)
         },
         closed: Boolean(week.closed)
       },
@@ -135,6 +137,9 @@
         saturation: null,
         medication: null,
         exercise: null,
+        meals: null,
+        gratitude: null,
+        sleep: null,
         note: "",
         completedAt: null
       };
@@ -194,6 +199,9 @@
     selectSegment("#saturation-control", entry.saturation);
     selectSegment("#medication-control", entry.medication === null ? null : String(entry.medication));
     selectSegment("#exercise-control", entry.exercise === null ? null : String(entry.exercise));
+    selectSegment("#meals-control", entry.meals == null ? null : String(entry.meals));
+    selectSegment("#gratitude-control", entry.gratitude == null ? null : String(entry.gratitude));
+    selectSegment("#sleep-control", entry.sleep || null);
     $$("#view-today button, #view-today textarea").forEach(control => {
       control.disabled = state.currentWeek.closed;
     });
@@ -206,7 +214,7 @@
     $("#note-count").textContent = `${note.value.length}/240`;
 
     const finishButton = $("#finish-day");
-    const isComplete = Boolean(entry.completedAt);
+    const isComplete = Boolean(entry.completedAt) && isDailyEntryComplete(entry);
     finishButton.textContent = isComplete ? "✓ Registro de hoy completo" : "Terminé por hoy";
     finishButton.classList.toggle("is-complete", isComplete);
   }
@@ -217,6 +225,15 @@
       button.classList.toggle("is-selected", selected);
       button.setAttribute("aria-pressed", String(selected));
     });
+  }
+
+  function isDailyEntryComplete(entry) {
+    return Boolean(entry.saturation)
+      && entry.medication != null
+      && entry.exercise != null
+      && entry.meals != null
+      && entry.gratitude != null
+      && Boolean(entry.sleep);
   }
 
   function renderWeek() {
@@ -333,6 +350,7 @@
       ayrton: state.currentWeek.weekly.ayrton,
       claribel: state.currentWeek.weekly.claribel,
       expenses: state.currentWeek.weekly.expenses,
+      church: state.currentWeek.weekly.church,
       predominantSaturation: predominantSaturation(state.currentWeek),
       daily: structuredCloneSafe(state.currentWeek.daily)
     };
@@ -395,13 +413,21 @@
       });
     });
 
-    ["medication", "exercise"].forEach(field => {
+    ["medication", "exercise", "meals", "gratitude"].forEach(field => {
       $$(`#${field}-control button`).forEach(button => {
         button.addEventListener("click", () => {
           getTodayEntry()[field] = button.dataset.value === "true";
           saveState();
           renderToday();
         });
+      });
+    });
+
+    $$("#sleep-control button").forEach(button => {
+      button.addEventListener("click", () => {
+        getTodayEntry().sleep = button.dataset.value;
+        saveState();
+        renderToday();
       });
     });
 
@@ -414,12 +440,10 @@
 
     $("#finish-day").addEventListener("click", () => {
       const entry = getTodayEntry();
-      const requiredComplete = entry.saturation
-        && entry.medication !== null
-        && entry.exercise !== null;
+      const requiredComplete = isDailyEntryComplete(entry);
 
       if (!requiredComplete) {
-        showToast("Elige saturación, pastilla y ejercicio.");
+        showToast("Completa los seis registros del día.");
         return;
       }
 

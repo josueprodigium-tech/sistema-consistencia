@@ -49,25 +49,66 @@
           </div>
         </article>
 
-        <div class="two-column">
-          <article class="card compact">
-            <p class="habit-icon" aria-hidden="true">💊</p>
-            <h3>¿Cumplida?</h3>
+        <div class="habit-grid">
+          <article class="card habit-card">
+            <div class="habit-heading">
+              <span class="habit-icon" aria-hidden="true">💊</span>
+              <h3>Pastilla</h3>
+            </div>
             <div class="segmented" id="medication-control" role="group" aria-label="Medicación">
               <button type="button" data-value="true">Sí</button>
               <button type="button" data-value="false">No</button>
             </div>
           </article>
 
-          <article class="card compact">
-            <p class="habit-icon" aria-hidden="true">🏋️</p>
-            <h3>¿Hecho?</h3>
+          <article class="card habit-card">
+            <div class="habit-heading">
+              <span class="habit-icon" aria-hidden="true">🏋️</span>
+              <h3>Ejercicio</h3>
+            </div>
             <div class="segmented" id="exercise-control" role="group" aria-label="Ejercicio">
               <button type="button" data-value="true">Sí</button>
               <button type="button" data-value="false">No</button>
             </div>
           </article>
+
+          <article class="card habit-card">
+            <div class="habit-heading">
+              <span class="habit-icon" aria-hidden="true">🍽️</span>
+              <h3>Comidas</h3>
+            </div>
+            <div class="segmented" id="meals-control" role="group" aria-label="Comidas en orden">
+              <button type="button" data-value="true">En orden</button>
+              <button type="button" data-value="false">No</button>
+            </div>
+          </article>
+
+          <article class="card habit-card">
+            <div class="habit-heading">
+              <span class="habit-icon" aria-hidden="true">🙏</span>
+              <h3>Agradecimiento</h3>
+            </div>
+            <div class="segmented" id="gratitude-control" role="group" aria-label="Agradecimiento">
+              <button type="button" data-value="true">Sí</button>
+              <button type="button" data-value="false">No</button>
+            </div>
+          </article>
         </div>
+
+        <article class="card sleep-card">
+          <div class="habit-heading">
+            <span class="habit-icon" aria-hidden="true">😴</span>
+            <div>
+              <p class="card-kicker">Descanso</p>
+              <h3>¿Cómo dormiste?</h3>
+            </div>
+          </div>
+          <div class="segmented three-choice" id="sleep-control" role="group" aria-label="Calidad del sueño">
+            <button type="button" data-value="good">Bien</button>
+            <button type="button" data-value="regular">Regular</button>
+            <button type="button" data-value="bad">Mal</button>
+          </div>
+        </article>
 
         <article class="card">
           <label for="daily-note">
@@ -129,6 +170,10 @@
           </button>
           <button type="button" class="check-row" data-week-toggle="expenses">
             <span><small>Administración</small>Gastos registrados</span>
+            <span class="switch" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="check-row" data-week-toggle="church">
+            <span class="weekly-label"><span class="weekly-emoji" aria-hidden="true">⛪</span><span><small>Bienestar</small>Iglesia</span></span>
             <span class="switch" aria-hidden="true"></span>
           </button>
         </div>
