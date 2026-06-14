@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "sistema-consistencia-v1";
+  const MAX_ENROLLMENTS = 999;
   const SATURATION_LABELS = {
     green: "Verde",
     yellow: "Amarillo",
@@ -92,7 +93,7 @@
         daily: week.daily && typeof week.daily === "object" ? week.daily : {},
         weekly: {
           talks: safeNumber(week.weekly?.talks, 0, 2),
-          enrollments: safeNumber(week.weekly?.enrollments, 0, 1),
+          enrollments: safeNumber(week.weekly?.enrollments, 0, MAX_ENROLLMENTS),
           ayrton: Boolean(week.weekly?.ayrton),
           claribel: Boolean(week.weekly?.claribel),
           expenses: Boolean(week.weekly?.expenses)
@@ -248,7 +249,7 @@
       ["Medicación", `${result.medicationDays}/7 días`, result.parts.medication, 35],
       ["Ejercicio", `${result.exerciseDays}/7 días`, result.parts.exercise, 35],
       ["Charlas propias", `${state.currentWeek.weekly.talks}/2`, result.parts.talks, 10],
-      ["Inscripción propia", `${state.currentWeek.weekly.enrollments}/1`, result.parts.enrollments, 5],
+      ["Inscripción propia", `${state.currentWeek.weekly.enrollments} (meta 1)`, result.parts.enrollments, 5],
       ["Sesión Ayrton", state.currentWeek.weekly.ayrton ? "Sí" : "No", result.parts.ayrton, 5],
       ["Sesión Claribel", state.currentWeek.weekly.claribel ? "Sí" : "No", result.parts.claribel, 5],
       ["Gastos registrados", state.currentWeek.weekly.expenses ? "Sí" : "No", result.parts.expenses, 5]
@@ -278,7 +279,7 @@
             <h3 class="history-date">${escapeHtml(formatDate(item.startDate, { day: "numeric", month: "long", year: "numeric" }))}</h3>
             <div class="history-stats">
               <span>Charlas ${safeNumber(item.talks, 0, 2)}/2</span>
-              <span>Inscripciones ${safeNumber(item.enrollments, 0, 1)}/1</span>
+              <span>Inscripciones ${safeNumber(item.enrollments, 0, MAX_ENROLLMENTS)} (meta 1)</span>
               <span>Saturación: ${escapeHtml(SATURATION_LABELS[saturation] || SATURATION_LABELS.none)}</span>
             </div>
           </div>
@@ -410,7 +411,7 @@
         const button = event.target.closest("button");
         if (!button) return;
         const field = counter.dataset.counter;
-        const max = field === "talks" ? 2 : 1;
+        const max = field === "talks" ? 2 : MAX_ENROLLMENTS;
         const change = button.dataset.action === "increase" ? 1 : -1;
         state.currentWeek.weekly[field] = safeNumber(state.currentWeek.weekly[field] + change, 0, max);
         saveState();
